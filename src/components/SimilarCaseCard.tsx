@@ -18,7 +18,7 @@ function formatDisappearanceDate(raw: string | null | undefined): string | null 
 
   const d = new Date(s);
   if (!Number.isNaN(d.getTime())) {
-    return new Intl.DateTimeFormat("es-MX", {
+    return new Intl.DateTimeFormat("en-US", {
       dateStyle: "medium",
       timeZone: "UTC",
     }).format(d);
@@ -32,9 +32,9 @@ function formatHeight(estatura: number | null | undefined): string | null {
 
   const n = Number(estatura);
   if (n >= 25) {
-    return `${new Intl.NumberFormat("es-MX", { maximumFractionDigits: 0 }).format(n)} cm`;
+    return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n)} cm`;
   }
-  return `${new Intl.NumberFormat("es-MX", { maximumFractionDigits: 2 }).format(n)} m`;
+  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n)} m`;
 }
 
 function Detail({
@@ -102,7 +102,7 @@ function SimilarCasePhotoLightbox({
           type="button"
           onClick={onClose}
           className="absolute -top-2 -right-2 rounded-full bg-white text-wc-ink w-9 h-9 flex items-center justify-center shadow-card hover:bg-wc-cream text-lg leading-none"
-          aria-label="Cerrar imagen ampliada"
+          aria-label="Close enlarged photo"
         >
           ✕
         </button>
@@ -129,15 +129,15 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
         photoUrl={photoUrl ?? ""}
         alt={
           c.nombre_completo
-            ? `Foto registral · ${c.nombre_completo}`
-            : "Foto del registro de persona desaparecida"
+            ? `Registry photo · ${c.nombre_completo}`
+            : "Missing-person registry photo"
         }
         labelledById={lightboxTitleId}
         onClose={() => setLightboxOpen(false)}
       />
       <span id={lightboxTitleId} className="sr-only">
-        Imagen ampliada{": "}
-        {c.nombre_completo ?? "registro público"}
+        Enlarged photo{": "}
+        {c.nombre_completo ?? "public registry record"}
       </span>
 
       <div className="aspect-[4/5] bg-wc-cream relative overflow-hidden shrink-0">
@@ -149,7 +149,7 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
               setLightboxOpen(true);
             }}
             className="group absolute inset-0 z-[1] block cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wc-gold focus-visible:ring-inset text-left"
-            aria-label="Ver foto en tamaño completo"
+            aria-label="View full-size photo"
           >
             <img
               src={photoUrl}
@@ -162,7 +162,7 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
             />
             <span className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-wc-ink/70 via-wc-ink/20 to-transparent py-10 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <span className="block text-center font-stadium uppercase tracking-wide text-[10px] text-white drop-shadow-sm">
-                Toca para ampliar
+                Click to enlarge
               </span>
             </span>
           </button>
@@ -178,33 +178,33 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
 
       <div className="p-3 flex flex-col flex-1 min-h-0">
         <p className="font-stadium uppercase tracking-wide text-sm text-wc-ink line-clamp-2">
-          {c.nombre_completo ?? "Sin nombre en el registro"}
+          {c.nombre_completo ?? "Name not listed"}
         </p>
 
         <dl className="mt-2 space-y-2 flex-1">
           {c.id_cedula_busqueda != null && (
-            <Detail label="Expediente" value={String(c.id_cedula_busqueda)} />
+            <Detail label="Case file #" value={String(c.id_cedula_busqueda)} />
           )}
           <Detail
-            label="Edad al desaparecer"
+            label="Age at disappearance"
             value={
               c.edad_momento_desaparicion != null
-                ? `${c.edad_momento_desaparicion} años`
-                : "No registrada"
+                ? `${c.edad_momento_desaparicion} years`
+                : "Not recorded"
             }
           />
-          {heightLabel && <Detail label="Estatura" value={heightLabel} />}
+          {heightLabel && <Detail label="Height" value={heightLabel} />}
           <Detail
-            label="Tez"
-            value={c.tez?.trim() ? c.tez.trim() : "No registrada"}
+            label="Skin color"
+            value={c.tez?.trim() ? c.tez.trim() : "Not recorded"}
           />
           <Detail
-            label="Color de ojos"
-            value={c.ojos_color?.trim() ? c.ojos_color.trim() : "No registrado"}
+            label="Eye color"
+            value={c.ojos_color?.trim() ? c.ojos_color.trim() : "Not recorded"}
           />
           <Detail
-            label="Fecha de desaparición"
-            value={dateLabel ?? "No registrada"}
+            label="Disappearance date"
+            value={dateLabel ?? "Not recorded"}
           />
         </dl>
       </div>
