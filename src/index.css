@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-wc-cream text-wc-ink font-body antialiased;
+  background-image:
+    radial-gradient(1200px 600px at 110% -10%, rgba(255, 184, 28, 0.18), transparent 60%),
+    radial-gradient(900px 500px at -10% 120%, rgba(0, 104, 71, 0.18), transparent 60%);
+}
+
+/* Smooth focus ring tuned for the WC palette */
+*:focus-visible {
+  @apply outline-none ring-2 ring-wc-gold ring-offset-2 ring-offset-wc-cream;
+}
+
+@layer components {
+  .stadium-title {
+    @apply font-stadium tracking-wide uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .field-stripes {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(0, 104, 71, 0.08) 0 24px,
+      rgba(0, 104, 71, 0.16) 24px 48px
+    );
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+           bg-wc-green text-white font-stadium uppercase tracking-wide
+           px-6 py-3 text-base shadow-trophy
+           transition active:scale-[0.98] hover:bg-[#00744f]
+           disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+           bg-white text-wc-ink font-stadium uppercase tracking-wide
+           px-6 py-3 text-base shadow-card border-2 border-wc-ink/10
+           transition active:scale-[0.98] hover:bg-wc-cream;
+  }
+
+  .btn-share {
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+           bg-[#25D366] text-white font-stadium uppercase tracking-wide
+           px-6 py-3 text-base shadow-trophy
+           transition active:scale-[0.98] hover:bg-[#1ebe5b];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1
+           text-xs font-semibold uppercase tracking-wider;
+  }
+
+  .form-label {
+    @apply block text-xs font-stadium uppercase tracking-wider text-wc-ink/70 mb-1.5;
+  }
+
+  .form-input {
+    @apply w-full rounded-xl border-2 border-wc-ink/10 bg-white px-4 py-3
+           text-base text-wc-ink placeholder-wc-ink/40
+           focus:border-wc-green focus:ring-0 transition;
+  }
+}
