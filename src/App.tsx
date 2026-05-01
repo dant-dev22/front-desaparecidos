@@ -9,6 +9,8 @@ import { WelcomeModal } from "./components/WelcomeModal";
 import { Spinner } from "./components/Spinner";
 import { APP_NAME } from "./brand";
 import type { LocationsMap, RiskResponse } from "./types";
+import { CookieBanner } from "./components/CookieBanner";
+import { useCookieConsent } from "./hooks/useCookieConsent";
 
 type View = "welcome" | "form" | "loading" | "result";
 
@@ -17,6 +19,7 @@ export default function App() {
   const [result, setResult] = useState<RiskResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSimilar, setShowSimilar] = useState(false);
+  const { accepted: cookieAccepted, accept: acceptCookies } = useCookieConsent();
   const [locationsMap, setLocationsMap] = useState<LocationsMap | null>(null);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
@@ -125,6 +128,8 @@ export default function App() {
           onClose={() => setShowSimilar(false)}
         />
       )}
+
+      {!cookieAccepted && <CookieBanner onAccept={acceptCookies} />}
     </main>
   );
 }
