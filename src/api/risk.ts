@@ -5,7 +5,7 @@ const ABSOLUTE = (import.meta.env.VITE_API_BASE_URL ?? "https://estoyasalvo.com"
 
 function buildBaseUrl(): string {
   if (PREFIX) return PREFIX;
-  return ABSOLUTE;
+  return `${ABSOLUTE}/api`;
 }
 
 export interface GetRiskParams {

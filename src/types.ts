@@ -15,7 +15,6 @@ export interface RiskFormValues {
   edad: string;
   sexo: Sex | "";
   estatura: string;
-  colonia: string;
 }
 
 export interface SimilarCase {

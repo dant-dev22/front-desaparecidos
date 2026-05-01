@@ -70,7 +70,6 @@ export default function App() {
         edad: values.edad,
         sexo: values.sexo,
         estatura: values.estatura,
-        colonia: values.colonia,
       });
       setResult(data);
       setView("result");

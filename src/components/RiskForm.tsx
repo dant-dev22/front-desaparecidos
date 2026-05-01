@@ -8,6 +8,9 @@ import {
 } from "../utils/catalogResolve";
 import { Spinner } from "./Spinner";
 
+/** Used when GPS cannot map the user to a state in `/locations`. */
+const FALLBACK_CATALOG_STATE = "JALISCO";
+
 export interface RiskSubmitPayload {
   estado_id: number;
   municipio_id: number;
@@ -15,7 +18,6 @@ export interface RiskSubmitPayload {
   edad: number;
   sexo: Sex;
   estatura: number | null;
-  colonia: string | null;
 }
 
 interface RiskFormProps {
@@ -42,10 +44,10 @@ export function RiskForm({
     edad: "",
     sexo: "",
     estatura: "",
-    colonia: "",
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [autoFilledFromGeo, setAutoFilledFromGeo] = useState(false);
+  const [appliedGeoDefaults, setAppliedGeoDefaults] = useState(false);
+  const [geoZoneWarning, setGeoZoneWarning] = useState<string | null>(null);
 
   const estadoOptions = useMemo(() => {
     if (!locations) return [];
@@ -59,21 +61,43 @@ export function RiskForm({
   }, [locations, values.estado]);
 
   useEffect(() => {
-    if (autoFilledFromGeo || !locations) return;
-    if (!location?.state) return;
-    const st = findCanonicalState(locations, location.state);
-    if (!st) return;
-    setValues((v) => {
-      if (v.estado.trim() !== "" || v.municipio.trim() !== "") return v;
-      const next = { ...v, estado: st };
-      if (location.city) {
-        const mu = findCanonicalMunicipio(locations, st, location.city);
-        if (mu) next.municipio = mu;
-      }
-      return next;
-    });
-    setAutoFilledFromGeo(true);
-  }, [autoFilledFromGeo, location, locations]);
+    if (appliedGeoDefaults || !locations) return;
+    if (geoStatus === "idle" || geoStatus === "loading") return;
+
+    if (geoStatus === "denied" || geoStatus === "error" || !location) {
+      setAppliedGeoDefaults(true);
+      return;
+    }
+
+    const rawState = location.state?.trim() ?? "";
+    const st = rawState ? findCanonicalState(locations, rawState) : null;
+
+    if (st) {
+      setValues((v) => {
+        if (v.estado.trim() !== "" || v.municipio.trim() !== "") return v;
+        const next = { ...v, estado: st };
+        if (location.city) {
+          const mu = findCanonicalMunicipio(locations, st, location.city);
+          if (mu) next.municipio = mu;
+        }
+        return next;
+      });
+      setGeoZoneWarning(null);
+      setAppliedGeoDefaults(true);
+      return;
+    }
+
+    if (locations[FALLBACK_CATALOG_STATE]) {
+      setValues((v) => {
+        if (v.estado.trim() !== "" || v.municipio.trim() !== "") return v;
+        return { ...v, estado: FALLBACK_CATALOG_STATE, municipio: "" };
+      });
+      setGeoZoneWarning(
+        "The app isn't available in your area yet. Jalisco will be used as the default state so you can continue.",
+      );
+    }
+    setAppliedGeoDefaults(true);
+  }, [appliedGeoDefaults, geoStatus, location, locations]);
 
   function handleChange<K extends keyof RiskFormValues>(key: K, value: RiskFormValues[K]) {
     setValues((v) => ({ ...v, [key]: value }));
@@ -119,7 +143,6 @@ export function RiskForm({
       edad: Number(values.edad),
       sexo: values.sexo as Sex,
       estatura: values.estatura ? Number(values.estatura) : null,
-      colonia: values.colonia.trim() ? values.colonia.trim() : null,
     });
   }
 
@@ -162,6 +185,15 @@ export function RiskForm({
             className="rounded-xl bg-wc-red/10 border-2 border-wc-red/20 px-4 py-3 text-sm text-wc-red"
           >
             {locationsError}
+          </div>
+        )}
+
+        {locationsReady && geoZoneWarning && (
+          <div
+            role="status"
+            className="rounded-xl bg-wc-gold/15 border-2 border-wc-gold/40 px-4 py-3 text-sm text-wc-ink"
+          >
+            {geoZoneWarning}
           </div>
         )}
 
@@ -307,41 +339,24 @@ export function RiskForm({
           </div>
         </div>
 
-        {/* Height + Neighborhood */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label htmlFor="estatura" className="form-label">
-              Height (m) <span className="text-wc-ink/40 normal-case">· optional</span>
-            </label>
-            <input
-              id="estatura"
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              min={0.5}
-              max={2.5}
-              className="form-input"
-              placeholder="1.75"
-              value={values.estatura}
-              onChange={(e) => handleChange("estatura", e.target.value)}
-              onBlur={() => setTouched((t) => ({ ...t, estatura: true }))}
-              disabled={!locationsReady || !!locationsError}
-            />
-          </div>
-          <div>
-            <label htmlFor="colonia" className="form-label">
-              Neighborhood <span className="text-wc-ink/40 normal-case">· optional</span>
-            </label>
-            <input
-              id="colonia"
-              type="text"
-              className="form-input"
-              placeholder="e.g. Historic center"
-              value={values.colonia}
-              onChange={(e) => handleChange("colonia", e.target.value)}
-              disabled={!locationsReady || !!locationsError}
-            />
-          </div>
+        <div>
+          <label htmlFor="estatura" className="form-label">
+            Height (m) <span className="text-wc-ink/40 normal-case">· optional</span>
+          </label>
+          <input
+            id="estatura"
+            type="number"
+            inputMode="decimal"
+            step="0.01"
+            min={0.5}
+            max={2.5}
+            className="form-input"
+            placeholder="1.75"
+            value={values.estatura}
+            onChange={(e) => handleChange("estatura", e.target.value)}
+            onBlur={() => setTouched((t) => ({ ...t, estatura: true }))}
+            disabled={!locationsReady || !!locationsError}
+          />
         </div>
 
         {(validationError || errorMessage) && (
