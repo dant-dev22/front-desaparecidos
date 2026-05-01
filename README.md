@@ -1,22 +1,22 @@
-# Home Run 2026 — Frontend
+# Enjoy your world cup — Frontend
 
-A **mobile-first web app** themed for the **FIFA World Cup 2026** (Mexico · USA · Canada). Fans fill a blunt check-in; the frontend calls the **risk API** (FastAPI backend) that scrapes whichever **public disappearance registry** feeds it server-side — no sanitized branding in the UI, just “we’re tossing your profile against the missing-person roster.”
+A **mobile-first web app** themed for the **FIFA World Cup** (2026 hosts: Mexico · USA · Canada). Fans fill a blunt check-in; the frontend calls the **risk API** (FastAPI backend) that scrapes whichever **public disappearance registry** feeds it server-side — no sanitized branding in the UI, just “we’re tossing your profile against the missing-person roster.”
 
 The app:
 
-- Greets the user with a World Cup pop-up — *"Welcome to the World Cup! Want to know your chances of getting home?"*.
+- Greets the user with a welcome pop-up for **Enjoy your world cup** (*Want to know your chances of getting home safely?*).
 - Auto-detects the device location (Geolocation API + Nominatim) and tries to match **state/municipality** entries from `GET /locations` when GPS labels align; otherwise the user picks catalogue rows manually — the UI never free-text guesses IDs.
 - Submits `GET /risk` with **`estado` + `municipio_id`** (from `GET /locations`), plus `edad`, `sexo`, optional `estatura`, `colonia`, and optional `municipio_nombre` for readable labels.
 - Shows a result card with score, risk level, and similar-case count.
 - Opens a modal with **up to 3 similar rows** surfaced from that registry snapshot (photo, name-ish label, disappearance age, opaque file ids).
-- Offers a one-tap **WhatsApp live-location share** that lets the user pick a chat and send a Google Maps link to a fresh GPS fix.
+- Offers a one-tap **WhatsApp share** with the selected city and a Google Maps search link (city area, no precise GPS in the message).
 
 > Public disappearance-registry payloads only · Crude-awareness copy in the bundle · FIFA does not sponsor this carnival.
 
 ## Stack
 
 - **Vite + React 18 + TypeScript**
-- **Tailwind CSS** with a custom World Cup 2026 palette (Mexico green, red, USA navy, trophy gold) and stadium-style typography (Bebas Neue / Oswald + Inter)
+- **Tailwind CSS** with a custom World Cup palette (Mexico green, red, USA navy, trophy gold) and stadium-style typography (Bebas Neue / Oswald + Inter)
 - **Browser Geolocation API** + Nominatim reverse geocoding (no API key needed)
 - **Native fetch**, no extra HTTP libraries
 - Mobile-first responsive layout, AA-style focus rings, animated spinner with all four WC colors, semantic landmarks, SEO meta tags + JSON-LD
@@ -118,7 +118,7 @@ app.add_middleware(
 )
 ```
 
-For a tighter posture, replace `["*"]` with your deployed frontend origin (e.g. `["https://homerun2026.example"]`). Because we don't send credentials, `allow_credentials=False` is fine.
+For a tighter posture, replace `["*"]` with your deployed frontend origin (e.g. `["https://enjoyyourworldcup.example"]`). Because we don't send credentials, `allow_credentials=False` is fine.
 
 The reverse-geocoding call goes to `https://nominatim.openstreetmap.org`, which sets permissive CORS by default — no extra config needed. Be courteous and don't hammer it; one request per check is plenty.
 
@@ -126,7 +126,7 @@ The reverse-geocoding call goes to `https://nominatim.openstreetmap.org`, which 
 
 - **Permissions:** Browsers only expose `navigator.geolocation` on **secure origins** (HTTPS or `localhost`). When deploying, serve the frontend over HTTPS or location detection silently fails on iOS Safari.
 - **Reverse geocoding** returns whatever city Nominatim resolves for the user's coordinates. **Heads-up:** `estado` / municipio labels must normalize into the **`/locations` catalog** baked into the backend; if GPS guesses miss, pick combos manually — the machinery only queries where it has CVE-style coverage.
-- **WhatsApp share** uses `https://wa.me/?text=...` with a fresh `getCurrentPosition` call so the link contains an up-to-the-second Google Maps fix. On mobile this opens the WhatsApp app and shows the chat picker; on desktop it opens WhatsApp Web. The Web platform doesn't expose WhatsApp's *Live Location* feature directly — the closest equivalent is sharing a Maps URL, which we do.
+- **WhatsApp share** uses `https://wa.me/?text=...` with the result city and a Google Maps search URL for that city (no exact coordinates in the shared text).
 
 ## Accessibility & SEO
 

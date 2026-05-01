@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // FIFA World Cup 2026 — host nations: Mexico, USA, Canada
+        // FIFA World Cup (2026 hosts: Mexico, USA, Canada)
         wc: {
           green: "#006847", // Mexico green
           red: "#CE1126", // Mexico / Canada red

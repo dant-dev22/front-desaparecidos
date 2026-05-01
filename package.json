@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "World Cup 2026 mobile-first companion that rough-checks profiles against public disappearance-registry data surfaced by its FastAPI backend.",
+  "description": "Enjoy your world cup — mobile-first companion that rough-checks profiles against public disappearance-registry data surfaced by its FastAPI backend.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

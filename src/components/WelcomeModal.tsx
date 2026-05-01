@@ -1,3 +1,5 @@
+import { APP_NAME } from "../brand";
+
 interface WelcomeModalProps {
   open: boolean;
   onAccept: () => void;
@@ -22,7 +24,7 @@ export function WelcomeModal({ open, onAccept }: WelcomeModalProps) {
               id="welcome-title"
               className="stadium-title text-3xl sm:text-4xl mt-3 leading-tight"
             >
-              Welcome to the<br />World Cup 2026!
+              {APP_NAME}!
             </h1>
             <p className="mt-3 text-white/90 font-body text-sm sm:text-base">
             48 nations. One trophy. Millions of fans. One opportunity to never go home.

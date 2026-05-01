@@ -7,6 +7,7 @@ import { SimilarCasesModal } from "./components/SimilarCasesModal";
 import { ResultCard } from "./components/ResultCard";
 import { WelcomeModal } from "./components/WelcomeModal";
 import { Spinner } from "./components/Spinner";
+import { APP_NAME } from "./brand";
 import type { LocationsMap, RiskResponse } from "./types";
 
 type View = "welcome" | "form" | "loading" | "result";
@@ -16,7 +17,6 @@ export default function App() {
   const [result, setResult] = useState<RiskResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSimilar, setShowSimilar] = useState(false);
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [locationsMap, setLocationsMap] = useState<LocationsMap | null>(null);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
@@ -53,14 +53,6 @@ export default function App() {
   async function handleSubmit(values: RiskSubmitPayload) {
     setError(null);
     setView("loading");
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-        () => {},
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 },
-      );
-    }
 
     try {
       const data = await getRisk({
@@ -119,7 +111,6 @@ export default function App() {
               result={result}
               onViewSimilar={() => setShowSimilar(true)}
               onReset={reset}
-              coords={coords}
             />
           )}
         </section>
@@ -146,9 +137,9 @@ function BrandHeader() {
           ⚽
         </div>
         <div className="leading-tight">
-          <p className="stadium-title text-lg sm:text-xl text-wc-ink">Home Run 2026</p>
+          <p className="stadium-title text-lg sm:text-xl text-wc-ink">{APP_NAME}</p>
           <p className="text-[11px] uppercase tracking-widest text-wc-ink/50">
-            World Cup safety companion
+            Travel safety companion
           </p>
         </div>
       </div>

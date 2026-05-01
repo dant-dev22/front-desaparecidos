@@ -6,7 +6,6 @@ interface ResultCardProps {
   result: RiskResponse;
   onViewSimilar: () => void;
   onReset: () => void;
-  coords: { lat: number; lon: number } | null;
 }
 
 const LEVEL_LABEL: Record<string, string> = {
@@ -33,7 +32,7 @@ const LEVEL_STYLES: Record<string, { bar: string; chip: string; emoji: string }>
   },
 };
 
-export function ResultCard({ result, onViewSimilar, onReset, coords }: ResultCardProps) {
+export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) {
   const styles = LEVEL_STYLES[result.nivel] ?? LEVEL_STYLES.medio;
   const label = LEVEL_LABEL[result.nivel] ?? result.nivel.toUpperCase();
   const cityLabel = prettyCity(result.municipio) || result.municipio;
@@ -62,8 +61,7 @@ export function ResultCard({ result, onViewSimilar, onReset, coords }: ResultCar
             Pulled blunt from that ledger:{" "}
             <strong>{result.total_casos_similares}</strong>{" "}
             {result.total_casos_similares === 1 ? "entry" : "entries"}
-            snapped close to your profile near <strong>{cityLabel}</strong>
-            {result.colonia ? <> · block {result.colonia}</> : null}.
+            snapped close to your profile near <strong>{cityLabel}</strong>.
           </p>
         </div>
       </header>
@@ -119,7 +117,7 @@ export function ResultCard({ result, onViewSimilar, onReset, coords }: ResultCar
             View similar cases
           </button>
 
-          <ShareLocationButton coords={coords} />
+          <ShareLocationButton cityLabel={cityLabel} />
 
           <button
             type="button"

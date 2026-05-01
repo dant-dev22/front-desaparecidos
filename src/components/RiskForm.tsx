@@ -204,27 +204,22 @@ export function RiskForm({
               <span className="text-2xl" aria-hidden="true">📍</span>
               <div className="min-w-0">
                 <p className="font-stadium uppercase tracking-wider text-xs text-wc-ink/60">
-                  Detected location
+                  Detected city
                 </p>
                 {geoStatus === "loading" && (
                   <p className="text-sm text-wc-ink/70 flex items-center gap-2">
-                    <Spinner size="sm" /> Pinging the GPS…
+                    <Spinner size="sm" /> Detecting city…
                   </p>
                 )}
                 {geoStatus === "ready" && (
                   <p className="text-sm text-wc-ink truncate">
                     {location?.city ? (
-                      <>
-                        <span className="chip bg-wc-green text-white mr-2">
-                          {prettyCity(location.city)}
-                        </span>
-                        {location.raw && (
-                          <span className="text-wc-ink/50 text-xs">{location.raw}</span>
-                        )}
-                      </>
+                      <span className="chip bg-wc-green text-white mr-2">
+                        {prettyCity(location.city)}
+                      </span>
                     ) : (
                       <span className="text-wc-ink/60">
-                        Coordinates captured · city unknown
+                        City could not be detected — pick state and city below
                       </span>
                     )}
                   </p>
