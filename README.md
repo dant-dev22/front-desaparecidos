@@ -1,54 +1,46 @@
 # Enjoy your world cup — Frontend
 
-A **mobile-first web app** themed for the **FIFA World Cup** (2026 hosts: Mexico · USA · Canada). Fans fill a blunt check-in; the frontend calls the **risk API** (FastAPI backend) that scrapes whichever **public disappearance registry** feeds it server-side — no sanitized branding in the UI, just “we’re tossing your profile against the missing-person roster.”
+**Mobile-first** web app themed for the **FIFA World Cup** (2026 hosts: Mexico · USA · Canada). Users complete a safety check-in; the client talks to **`/locations` and `/risk` over HTTP**, shows risk stats, similar cases from the registry, and optional WhatsApp sharing by city.
 
 The app:
 
-- Greets the user with a welcome pop-up for **Enjoy your world cup** (*Want to know your chances of getting home safely?*).
-- Auto-detects the device location (Geolocation API + Nominatim) and tries to match **state/municipality** entries from `GET /locations` when GPS labels align; otherwise the user picks catalogue rows manually — the UI never free-text guesses IDs.
-- Submits `GET /risk` with **`estado` + `municipio_id`** (from `GET /locations`), plus `edad`, `sexo`, optional `estatura`, `colonia`, and optional `municipio_nombre` for readable labels.
-- Shows a result card with score, risk level, and similar-case count.
-- Opens a modal with **up to 3 similar rows** surfaced from that registry snapshot (photo, name-ish label, disappearance age, opaque file ids).
-- Offers a one-tap **WhatsApp share** with the selected city and a Google Maps search link (city area, no precise GPS in the message).
-
-> Public disappearance-registry payloads only · Crude-awareness copy in the bundle · FIFA does not sponsor this carnival.
+- Greets users with **Enjoy your world cup** (*Want to know your chances of getting home safely?*).
+- Auto-detects approximate area (Geolocation + Nominatim) and, when labels match the catalog from **`GET /locations`**, can pre-fill state/municipality; otherwise the user picks rows from the selectors.
+- Sends **`GET /risk`** with `estado` / `municipio_id`, `edad`, `sexo`, optional `estatura`, etc.
+- Shows a result card with score, level, and similar-case count, plus a modal with thumbnails/details when available.
+- **WhatsApp share** includes the city name and a Google Maps city search link (no exact GPS coordinates in the text).
 
 ## Stack
 
 - **Vite + React 18 + TypeScript**
-- **Tailwind CSS** with a custom World Cup palette (Mexico green, red, USA navy, trophy gold) and stadium-style typography (Bebas Neue / Oswald + Inter)
-- **Browser Geolocation API** + Nominatim reverse geocoding (no API key needed)
-- **Native fetch**, no extra HTTP libraries
-- Mobile-first responsive layout, AA-style focus rings, animated spinner with all four WC colors, semantic landmarks, SEO meta tags + JSON-LD
+- **Tailwind CSS** — World Cup palette (Mexico green, red, USA navy, trophy gold), Bebas Neue / Oswald + Inter
+- **Geolocation** + **Nominatim** reverse geocoding (no API key)
+- **`fetch`** only for HTTP
 
 ## Project layout
 
 ```
 front-desaparecidos/
-├── index.html               # SEO meta tags, OG/Twitter cards, JSON-LD
-├── vite.config.ts           # Dev proxy /api → backend (avoids CORS)
-├── tailwind.config.js       # World Cup palette + animations
+├── ecosystem.config.cjs     # PM2: vite preview (production preview server)
+├── index.html               # SEO, OG/Twitter, JSON-LD
+├── vite.config.ts           # Dev proxy /api → VITE_API_BASE_URL
+├── tailwind.config.js       # Palette + animations
 ├── postcss.config.js
 ├── tsconfig*.json
 ├── public/
-│   └── favicon.svg          # Soccer-ball + WC palette
+│   └── favicon.svg
 ├── src/
 │   ├── main.tsx
-│   ├── App.tsx              # View state machine (welcome/form/loading/result)
-│   ├── index.css            # Tailwind layers + reusable component classes
+│   ├── App.tsx
+│   ├── brand.ts
+│   ├── index.css
 │   ├── types.ts
 │   ├── api/
-│   │   ├── risk.ts          # GET /risk client
-│   │   └── geocoding.ts     # Nominatim reverse geocode → host city
+│   │   ├── locations.ts
+│   │   ├── risk.ts
+│   │   └── geocoding.ts
 │   ├── hooks/
-│   │   └── useGeolocation.ts
 │   └── components/
-│       ├── WelcomeModal.tsx
-│       ├── RiskForm.tsx
-│       ├── ResultCard.tsx
-│       ├── SimilarCasesModal.tsx
-│       ├── ShareLocationButton.tsx
-│       └── Spinner.tsx
 └── README.md
 ```
 
@@ -58,93 +50,95 @@ Requires **Node.js 18+** and **npm**.
 
 ```bash
 cd front-desaparecidos
-cp .env.example .env       # On Windows: copy .env.example .env
+cp .env.example .env       # Windows: copy .env.example .env
 npm install
 npm run dev
 ```
 
-The dev server starts on `http://localhost:5173`. Open it on your phone (same Wi-Fi) using `http://<your-LAN-IP>:5173` for the real mobile experience.
+Dev server: `http://localhost:5173`. On your phone (same LAN): `http://<your-LAN-IP>:5173`.
 
-### Backend API
-
-By default `.env` points to the public FastAPI host **[estoyasalvo.com](https://estoyasalvo.com)** (`/locations`, `/risk`). You can confirm the catalog at [https://estoyasalvo.com/locations](https://estoyasalvo.com/locations).
-
-To use the repo backend locally instead (`../app-desaparecidos/backend`), set `VITE_API_BASE_URL=http://127.0.0.1:8000` and optionally `VITE_API_PREFIX=/api`:
-
-```bash
-cd app-desaparecidos/backend
-python -m venv .venv
-# Windows PowerShell:
-.\.venv\Scripts\Activate.ps1
-# macOS / Linux:
-# source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-### Production build
+### Production build (local smoke test)
 
 ```bash
 npm run build
-npm run preview        # serves dist/ on http://localhost:4173
+npm run preview        # serves dist/ — default preview port in this repo matches PM2 (4173)
 ```
 
 ## Configuration
 
-`.env` (copied from `.env.example`):
+Copy `.env.example` → `.env` (or `.env.production` for `npm run build`). Variables prefixed with **`VITE_`** are inlined at **build time** — rebuild after changing them.
 
-| Variable | Description | Default |
+| Variable | Description | Typical default |
 | --- | --- | --- |
-| `VITE_API_BASE_URL` | Absolute URL of the FastAPI backend | `https://estoyasalvo.com` |
-| `VITE_API_PREFIX` | Prefix for API calls. Empty `""` hits `VITE_API_BASE_URL` directly (used for public backend + production builds). `/api` routes through the Vite dev proxy to that same base URL. | _(empty)_ |
+| `VITE_API_BASE_URL` | Origin of the HTTP API (`/locations`, `/risk`), no trailing slash | _(see `.env.example`)_ |
+| `VITE_API_PREFIX` | Empty: browser calls `VITE_API_BASE_URL` directly. `/api`: in **`npm run dev` only**, requests go to same origin `/api/*` via Vite proxy to `VITE_API_BASE_URL`. | _(empty in production)_ |
 
-## CORS notes
+## Actualizar el front en el VPS (PM2)
 
-The public API at **estoyasalvo.com** allows browser calls from another origin (`allow_origins=["*"]`). The default frontend setup calls `https://estoyasalvo.com/locations` and `…/risk` directly (even on `npm run dev`), so normal CORS preflights apply and succeed.
+Asunciones: ya clonaste el repo en el servidor, tienes **Node.js 18+**, **PM2** instalado (`npm install -g pm2`) y usas **`ecosystem.config.cjs`** como en este proyecto (sirve el build estático con **`vite preview`** en **`127.0.0.1:4173`**, típicamente detrás de Nginx u otro reverse proxy SSL).
 
-Optional for **development only:**
+Variables de entorno: si usás `.env` o `.env.production`, ajustalas **antes** del build (`npm run build` embebe `VITE_*` en los assets).
 
-1. **Vite proxy** — Set `VITE_API_PREFIX=/api`. `vite.config.ts` proxies `/api/*` → `VITE_API_BASE_URL`. The browser only talks to `http://localhost:5173`; no browser→API CORS. The proxy target defaults to **estoyasalvo.com** if `VITE_API_BASE_URL` is unset.
+Pasos rutinarios después de cambios en el código:
 
-The FastAPI app uses CORS middleware like:
-
-```python
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["GET", "OPTIONS"],
-    allow_headers=["*"],
-)
+```bash
+cd /ruta/al/front-desaparecidos          # tu ruta real en el VPS
+git pull                                 # o el flujo que uses (deploy key, CI, etc.)
+npm ci                                   # o npm install
+npm run build
+pm2 reload ecosystem.config.cjs --update-env
 ```
 
-For a tighter posture, replace `["*"]` with your deployed frontend origin (e.g. `["https://enjoyyourworldcup.example"]`). Because we don't send credentials, `allow_credentials=False` is fine.
+Equivalente si solo querés reiniciar la app por nombre:
 
-The reverse-geocoding call goes to `https://nominatim.openstreetmap.org`, which sets permissive CORS by default — no extra config needed. Be courteous and don't hammer it; one request per check is plenty.
+```bash
+pm2 reload front-desaparecidos --update-env
+```
+
+**Primera vez** en ese servidor:
+
+```bash
+cd /ruta/al/front-desaparecidos
+npm ci && npm run build
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 startup                            # sigue las instrucciones para habilitar al boot
+```
+
+Comprobar proceso y logs:
+
+```bash
+pm2 status
+pm2 logs front-desaparecidos
+```
+
+Reverse proxy: exponé públicamente HTTPS y reenviá el tráfico al puerto donde escucha **`vite preview`** (en este proyecto, **4173** en localhost). Mantener `listen 127.0.0.1` en PM2 reduce exposición innecesaria.
+
+## Reverse geocoding (Nominatim)
+
+Las peticiones salen desde el navegador a `https://nominatim.openstreetmap.org`. Respetá su política de uso (no hagas scraping agresivo; una petición por detección de ciudad es razonable).
 
 ## Geolocation and WhatsApp sharing
 
-- **Permissions:** Browsers only expose `navigator.geolocation` on **secure origins** (HTTPS or `localhost`). When deploying, serve the frontend over HTTPS or location detection silently fails on iOS Safari.
-- **Reverse geocoding** returns whatever city Nominatim resolves for the user's coordinates. **Heads-up:** `estado` / municipio labels must normalize into the **`/locations` catalog** baked into the backend; if GPS guesses miss, pick combos manually — the machinery only queries where it has CVE-style coverage.
-- **WhatsApp share** uses `https://wa.me/?text=...` with the result city and a Google Maps search URL for that city (no exact coordinates in the shared text).
+- **HTTPS:** sin HTTPS (o localhost), la geolocalización suele fallar en móviles — conviene TLS en producción.
+- **Catálogo:** las etiquetas GPS deben corresponder entradas del JSON de **`/locations`**; si no encajan, el usuario elige estado y municipio a mano.
+- **WhatsApp:** `wa.me` con texto + enlace Maps por nombre de ciudad.
 
 ## Accessibility & SEO
 
-- Semantic landmarks (`main`, `header`, `footer`, `article`, `dialog`).
-- `aria-modal`, `aria-labelledby`, `role="progressbar"`, `aria-live="polite"` for the spinner.
-- Focus-visible rings tuned for the WC palette.
-- SEO meta tags in `index.html`: `<title>`, `description`, canonical link, Open Graph, Twitter card, `theme-color`, and a `WebApplication` JSON-LD block.
+- Landmark semánticos, `dialog` accesible, `aria-live` donde aplica.
+- Meta tags y JSON-LD en `index.html`.
 
 ## Troubleshooting
 
-| Symptom | Likely cause | Fix |
+| Síntoma | Posible causa | Qué hacer |
 | --- | --- | --- |
-| `Failed to fetch` in dev | Backend not running | Start `uvicorn app.main:app --reload` |
-| CORS error in prod | Backend allow-list missing your origin | Add the frontend origin to `allow_origins` in `backend/app/main.py` |
-| Location stuck on "Pinging GPS…" | Permission denied or non-HTTPS host | Allow location, or serve over HTTPS |
-| Reverse geocoding silently fails | Nominatim rate-limited the IP | Wait a minute, or self-host Nominatim |
-| Validation `422`/bad query | Combo outside `/locations`, bad filters | Choose state+municipality from selects; tighten optional fields |
-| `504` timeouts while pulling registry blobs | Backend waiting on upstream disappearance API | Tune whatever HTTP timeout env the backend exposes for that scrape |
+| `Failed to fetch` | API caída, URL mal en build, firewall | Verificar `VITE_API_BASE_URL`, que el servidor responda, y redes |
+| Respuestas bloqueadas por navegador (CORS) | Origen del front ≠ origen configurado del API | Ajustar cabeceras CORS en **el servidor del API** para tu dominio |
+| Ciudad siempre vacía | Permisos o sitio sin HTTPS | Permitir ubicación; servir con TLS |
+| Geocoding falla | Límite o error de Nominatim | Reintentar con calma |
+| Respuestas 4xx del API | Payload inválido o combo fuera de catálogo | Revisar selects y parámetros |
+| Timeouts 5xx/504 | Instabilidad red o API | Reintentar; revisar salud del servicio remoto |
 
 ## License
 

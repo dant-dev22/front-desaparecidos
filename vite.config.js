@@ -20,6 +20,7 @@ export default defineConfig(function (_a) {
         preview: {
             port: 4173,
             host: true,
+            allowedHosts: ["estoyasalvo.com", "www.estoyasalvo.com"],
         },
     };
 });

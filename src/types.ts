@@ -22,6 +22,11 @@ export interface SimilarCase {
   ruta_foto: string | null;
   nombre_completo: string | null;
   edad_momento_desaparicion: number | null;
+  /** Metres from registry (nullable or omitted). */
+  estatura?: number | null;
+  tez?: string | null;
+  ojos_color?: string | null;
+  fecha_desaparicion?: string | null;
 }
 
 export interface RiskResponse {
