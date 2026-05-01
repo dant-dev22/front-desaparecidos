@@ -1,6 +1,7 @@
 import type { RiskResponse } from "../types";
 import { prettyCity } from "../types";
 import { ShareLocationButton } from "./ShareLocationButton";
+import { DonationSection } from "./DonationSection";
 
 interface ResultCardProps {
   result: RiskResponse;
@@ -14,19 +15,16 @@ const LEVEL_LABEL: Record<string, string> = {
   alto: "High risk",
 };
 
-const LEVEL_STYLES: Record<string, { bar: string; chip: string; emoji: string }> = {
+const LEVEL_STYLES: Record<string, { chip: string; emoji: string }> = {
   bajo: {
-    bar: "bg-wc-green",
     chip: "bg-wc-green text-white",
     emoji: "🟢",
   },
   medio: {
-    bar: "bg-wc-gold",
     chip: "bg-wc-gold text-wc-ink",
     emoji: "🟡",
   },
   alto: {
-    bar: "bg-wc-red",
     chip: "bg-wc-red text-white",
     emoji: "🔴",
   },
@@ -36,9 +34,6 @@ export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) 
   const styles = LEVEL_STYLES[result.nivel] ?? LEVEL_STYLES.medio;
   const label = LEVEL_LABEL[result.nivel] ?? result.nivel.toUpperCase();
   const cityLabel = prettyCity(result.municipio) || result.municipio;
-
-  // Visualize score on a 0-100 bar; cap at 100 for display.
-  const scorePct = Math.min(100, Math.round(result.score));
 
   return (
     <article className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-card overflow-hidden animate-pop">
@@ -67,30 +62,6 @@ export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) 
       </header>
 
       <div className="px-5 sm:px-7 py-6 space-y-5">
-        <div>
-          <div className="flex items-baseline justify-between">
-            <span className="form-label !mb-0">Risk score</span>
-            <span className="font-stadium text-3xl text-wc-ink">
-              {result.score.toFixed(1)}
-            </span>
-          </div>
-          <div
-            className="mt-2 h-3 w-full rounded-full bg-wc-ink/10 overflow-hidden"
-            role="progressbar"
-            aria-valuenow={scorePct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className={`h-full ${styles.bar} transition-[width] duration-700`}
-              style={{ width: `${scorePct}%` }}
-            />
-          </div>
-          <p className="text-[11px] uppercase tracking-wider text-wc-ink/50 mt-1">
-            Stack weight lifted from overlapping public disappearance rows (bar capped visually at 100).
-          </p>
-        </div>
-
         <dl className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-wc-cream p-4">
             <dt className="form-label">Similar cases</dt>
@@ -118,6 +89,8 @@ export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) 
           </button>
 
           <ShareLocationButton cityLabel={cityLabel} />
+
+          <DonationSection />
 
           <button
             type="button"
