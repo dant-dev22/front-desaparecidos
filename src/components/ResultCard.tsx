@@ -2,10 +2,10 @@ import type { RiskResponse } from "../types";
 import { prettyCity } from "../types";
 import { ShareLocationButton } from "./ShareLocationButton";
 import { DonationSection } from "./DonationSection";
+import { SimilarCaseCard } from "./SimilarCaseCard";
 
 interface ResultCardProps {
   result: RiskResponse;
-  onViewSimilar: () => void;
   onReset: () => void;
 }
 
@@ -30,7 +30,7 @@ const LEVEL_STYLES: Record<string, { chip: string; emoji: string }> = {
   },
 };
 
-export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) {
+export function ResultCard({ result, onReset }: ResultCardProps) {
   const styles = LEVEL_STYLES[result.nivel] ?? LEVEL_STYLES.medio;
   const label = LEVEL_LABEL[result.nivel] ?? result.nivel.toUpperCase();
   const cityLabel = prettyCity(result.municipio) || result.municipio;
@@ -77,17 +77,23 @@ export function ResultCard({ result, onViewSimilar, onReset }: ResultCardProps) 
           </div>
         </dl>
 
-        <div className="grid gap-3">
-          <button
-            type="button"
-            onClick={onViewSimilar}
-            className="btn-secondary w-full"
-            disabled={result.total_casos_similares === 0}
-          >
-            <span aria-hidden="true">📂</span>
-            View similar cases
-          </button>
+        {result.casos_similares.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="form-label">Registry matches (sample)</h3>
+            <ul className="space-y-2" aria-label="Similar disappearance records">
+              {result.casos_similares.slice(0, 3).map((c, i) => (
+                <SimilarCaseCard key={`${c.id_cedula_busqueda ?? "x"}-${i}`} c={c} />
+              ))}
+            </ul>
+            {result.total_casos_similares > 3 && (
+              <p className="text-center text-[10px] leading-snug text-wc-ink/45">
+                +{result.total_casos_similares - 3} more in the area tally.
+              </p>
+            )}
+          </div>
+        )}
 
+        <div className="grid gap-3">
           <ShareLocationButton cityLabel={cityLabel} />
 
           <DonationSection />

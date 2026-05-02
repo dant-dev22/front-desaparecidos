@@ -3,7 +3,6 @@ import { getLocations } from "./api/locations";
 import { getRisk } from "./api/risk";
 import { RiskForm } from "./components/RiskForm";
 import type { RiskSubmitPayload } from "./components/RiskForm";
-import { SimilarCasesModal } from "./components/SimilarCasesModal";
 import { ResultCard } from "./components/ResultCard";
 import { WelcomeModal } from "./components/WelcomeModal";
 import { Spinner } from "./components/Spinner";
@@ -18,7 +17,6 @@ export default function App() {
   const [view, setView] = useState<View>("welcome");
   const [result, setResult] = useState<RiskResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showSimilar, setShowSimilar] = useState(false);
   const { accepted: cookieAccepted, accept: acceptCookies } = useCookieConsent();
   const [locationsMap, setLocationsMap] = useState<LocationsMap | null>(null);
   const [locationsLoading, setLocationsLoading] = useState(true);
@@ -110,24 +108,12 @@ export default function App() {
           )}
 
           {view === "result" && result && (
-            <ResultCard
-              result={result}
-              onViewSimilar={() => setShowSimilar(true)}
-              onReset={reset}
-            />
+            <ResultCard result={result} onReset={reset} />
           )}
         </section>
 
         <Footer />
       </div>
-
-      {result && (
-        <SimilarCasesModal
-          open={showSimilar}
-          cases={result.casos_similares}
-          onClose={() => setShowSimilar(false)}
-        />
-      )}
 
       {!cookieAccepted && <CookieBanner onAccept={acceptCookies} />}
     </main>
