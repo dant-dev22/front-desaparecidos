@@ -36,7 +36,7 @@ function formatHeight(estatura: number | null | undefined): string | null {
   return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n)} m`;
 }
 
-/** Compact row for inline lists — tuned for small screens (no modal / lightbox). */
+/** List row with a larger photo thumbnail so registry images read clearly on phones. */
 export function SimilarCaseCard({ c }: { c: SimilarCase }) {
   const [imageFailed, setImageFailed] = useState(false);
   const initials = initialsFromName(c.nombre_completo ?? null);
@@ -51,8 +51,8 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
       : null;
 
   return (
-    <li className="flex gap-2.5 sm:gap-3 rounded-xl border border-wc-ink/8 bg-wc-cream/35 p-2.5 sm:p-3">
-      <div className="relative h-12 w-12 sm:h-[52px] sm:w-[52px] shrink-0 overflow-hidden rounded-lg bg-wc-cream ring-1 ring-wc-ink/5">
+    <li className="flex gap-3 sm:gap-4 rounded-xl border border-wc-ink/8 bg-wc-cream/35 p-3 sm:p-3.5">
+      <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl bg-wc-cream ring-1 ring-wc-ink/5">
         {showPhoto && photoUrl ? (
           <img
             src={photoUrl}
@@ -64,11 +64,11 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-stadium text-lg text-wc-ink/35">
+          <div className="flex h-full w-full items-center justify-center font-stadium text-2xl text-wc-ink/35">
             {initials || "?"}
           </div>
         )}
-        <span className="pointer-events-none absolute bottom-0 left-0 right-0 bg-wc-blue/90 px-1 py-0.5 text-center font-stadium text-[8px] uppercase tracking-wide text-white">
+        <span className="pointer-events-none absolute bottom-0 left-0 right-0 bg-wc-blue/90 px-1 py-0.5 text-center font-stadium text-[9px] sm:text-[10px] uppercase tracking-wide text-white">
           Missing
         </span>
       </div>
