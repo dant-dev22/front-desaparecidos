@@ -174,7 +174,7 @@ export function RiskForm({
           <div className="rounded-2xl border-2 border-wc-blue/20 bg-wc-blue/5 p-6 flex flex-col items-center gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-center text-wc-ink/70">
-              Pulling the state list the backend can legally scan inside the disappearance dump…
+              Loading available locations…
             </p>
           </div>
         )}
@@ -371,7 +371,7 @@ export function RiskForm({
           {submitting ? (
             <>
               <Spinner size="sm" />
-              <span>Checking the lineup…</span>
+              <span>Searching missing-person records…</span>
             </>
           ) : (
             <>
@@ -381,10 +381,6 @@ export function RiskForm({
           )}
         </button>
 
-        <p className="text-[11px] text-center text-wc-ink/50 leading-relaxed">
-          We stash nothing in this SPA — whatever you punched in gets blasted to the backend for one
-          pass through that disappearance spreadsheet. Anything public in there is still theirs, not ours.
-        </p>
       </div>
     </form>
   );

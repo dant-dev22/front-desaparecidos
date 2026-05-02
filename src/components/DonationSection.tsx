@@ -1,5 +1,5 @@
 const PAYPAL_URL =
-  "https://www.paypal.com/donate?business=dantedev22%40gmail.com&amount=5&currency_code=USD";
+  "https://www.paypal.com/donate?business=dantedev22%40gmail.com&amount=1&currency_code=USD";
 
 export function DonationSection() {
   return (

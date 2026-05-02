@@ -53,7 +53,6 @@ export function ResultCard({ result, onReset }: ResultCardProps) {
             </span>
           </div>
           <p className="text-sm text-white/80 mt-1">
-            Pulled blunt from that ledger:{" "}
             <strong>{result.total_casos_similares}</strong>{" "}
             {result.total_casos_similares === 1 ? "entry" : "entries"}
             snapped close to your profile near <strong>{cityLabel}</strong>.
@@ -79,8 +78,8 @@ export function ResultCard({ result, onReset }: ResultCardProps) {
 
         {result.casos_similares.length > 0 && (
           <div className="space-y-2">
-            <h3 className="form-label">Registry matches (sample)</h3>
-            <ul className="space-y-2" aria-label="Similar disappearance records">
+            <h3 className="form-label">Cases similar to yours</h3>
+            <ul className="space-y-2" aria-label="Cases similar to your profile">
               {result.casos_similares.slice(0, 3).map((c, i) => (
                 <SimilarCaseCard key={`${c.id_cedula_busqueda ?? "x"}-${i}`} c={c} />
               ))}

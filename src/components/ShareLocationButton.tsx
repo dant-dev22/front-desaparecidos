@@ -34,7 +34,7 @@ export function ShareLocationButton({ cityLabel }: ShareLocationButtonProps) {
   return (
     <button type="button" onClick={handleShare} className="btn-share w-full">
       <span aria-hidden="true">💚</span>
-      Share city on WhatsApp
+      Be safe — share your location on WhatsApp
     </button>
   );
 }

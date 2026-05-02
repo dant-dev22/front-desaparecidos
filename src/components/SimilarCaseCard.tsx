@@ -44,10 +44,11 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
   const showPhoto = Boolean(photoUrl) && !imageFailed;
   const dateLabel = formatDisappearanceDate(c.fecha_desaparicion ?? null);
   const heightLabel = formatHeight(c.estatura ?? null);
-  const ageLabel =
-    c.edad_momento_desaparicion != null ? `${c.edad_momento_desaparicion} yrs` : null;
-
-  const metaParts = [ageLabel, dateLabel, heightLabel].filter(Boolean) as string[];
+  const ageN = Number(c.edad_momento_desaparicion);
+  const ageYears =
+    c.edad_momento_desaparicion != null && !Number.isNaN(ageN)
+      ? `${ageN} ${ageN === 1 ? "year" : "years"}`
+      : null;
 
   return (
     <li className="flex gap-2.5 sm:gap-3 rounded-xl border border-wc-ink/8 bg-wc-cream/35 p-2.5 sm:p-3">
@@ -76,8 +77,27 @@ export function SimilarCaseCard({ c }: { c: SimilarCase }) {
         <p className="font-stadium text-[13px] sm:text-sm leading-snug text-wc-ink line-clamp-2">
           {c.nombre_completo ?? "Name not listed"}
         </p>
-        {metaParts.length > 0 && (
-          <p className="mt-1 text-[11px] leading-snug text-wc-ink/60">{metaParts.join(" · ")}</p>
+        {(ageYears || dateLabel || heightLabel) && (
+          <dl className="mt-1 space-y-0.5 text-[11px] leading-snug text-wc-ink/60">
+            {ageYears && (
+              <div className="flex flex-wrap gap-x-1">
+                <dt className="text-wc-ink/45 shrink-0">Age at disappearance:</dt>
+                <dd className="min-w-0">{ageYears}</dd>
+              </div>
+            )}
+            {dateLabel && (
+              <div className="flex flex-wrap gap-x-1">
+                <dt className="text-wc-ink/45 shrink-0">Date of disappearance:</dt>
+                <dd className="min-w-0">{dateLabel}</dd>
+              </div>
+            )}
+            {heightLabel && (
+              <div className="flex flex-wrap gap-x-1">
+                <dt className="text-wc-ink/45 shrink-0">Height:</dt>
+                <dd className="min-w-0">{heightLabel}</dd>
+              </div>
+            )}
+          </dl>
         )}
         {c.id_cedula_busqueda != null && (
           <p className="mt-0.5 text-[10px] tabular-nums text-wc-ink/45">

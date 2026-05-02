@@ -99,10 +99,9 @@ export default function App() {
 
           {view === "loading" && (
             <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-card p-10 flex flex-col items-center justify-center">
-              <Spinner size="lg" label="Rifling the disappearance ledger…" />
+              <Spinner size="lg" label="Loading…" />
               <p className="mt-4 text-center text-sm text-wc-ink/60 max-w-xs">
-                Each hit scratches the upstream registry cold, so the API can choke for a beat. Chill —
-                when it wakes up we’ll show whoever in that sheet looks uncomfortably close to you.
+                Searching missing-person records.
               </p>
             </div>
           )}
