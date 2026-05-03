@@ -1,7 +1,7 @@
 import type { LocationsMap } from "../types";
 
 const PREFIX = (import.meta.env.VITE_API_PREFIX ?? "").replace(/\/$/, "");
-const ABSOLUTE = (import.meta.env.VITE_API_BASE_URL ?? "https://estoyasalvo.com").replace(/\/$/, "");
+const ABSOLUTE = (import.meta.env.VITE_API_BASE_URL ?? "https://urworldcup.com").replace(/\/$/, "");
 
 function buildBaseUrl(): string {
   if (PREFIX) return PREFIX;
