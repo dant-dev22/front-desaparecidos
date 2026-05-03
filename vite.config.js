@@ -4,7 +4,7 @@ export default defineConfig(function (_a) {
     var _b;
     var mode = _a.mode;
     var env = loadEnv(mode, process.cwd(), "");
-    var apiBase = (_b = env.VITE_API_BASE_URL) !== null && _b !== void 0 ? _b : "https://estoyasalvo.com";
+    var apiBase = (_b = env.VITE_API_BASE_URL) !== null && _b !== void 0 ? _b : "https://urworldcup.com";
     return {
         plugins: [react()],
         server: {
@@ -20,7 +20,7 @@ export default defineConfig(function (_a) {
         preview: {
             port: 4173,
             host: true,
-            allowedHosts: ["estoyasalvo.com", "www.estoyasalvo.com"],
+            allowedHosts: ["urworldcup.com", "www.urworldcup.com"],
         },
     };
 });
