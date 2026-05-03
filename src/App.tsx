@@ -21,6 +21,7 @@ export default function App() {
   const [locationsMap, setLocationsMap] = useState<LocationsMap | null>(null);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
+  const [loadingPhase, setLoadingPhase] = useState(0);
 
   useEffect(() => {
     let stale = false;
@@ -37,7 +38,12 @@ export default function App() {
         if (stale) return;
         const name = e instanceof Error ? e.name : "";
         if (name === "AbortError") return;
-        setLocationsError(e instanceof Error ? e.message : "Could not load locations.");
+        const msg = e instanceof Error ? e.message : "Could not load locations.";
+        setLocationsError(
+          /\(5\d\d\)/.test(msg)
+            ? "There was an error loading the missing persons data, please try again."
+            : msg,
+        );
       })
       .finally(() => {
         if (!stale) setLocationsLoading(false);
@@ -50,6 +56,19 @@ export default function App() {
   }, []);
 
   const locationsReady = !locationsLoading && locationsError === null && locationsMap !== null;
+
+  useEffect(() => {
+    if (view !== "loading") {
+      setLoadingPhase(0);
+      return;
+    }
+    const t1 = setTimeout(() => setLoadingPhase(1), 5000);
+    const t2 = setTimeout(() => setLoadingPhase(2), 10000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [view]);
 
   async function handleSubmit(values: RiskSubmitPayload) {
     setError(null);
@@ -67,7 +86,12 @@ export default function App() {
       setResult(data);
       setView("result");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      setError(
+        /\(5\d\d\)/.test(msg)
+          ? "There was an error loading the missing persons data, please try again."
+          : msg,
+      );
       setView("form");
     }
   }
@@ -99,9 +123,11 @@ export default function App() {
 
           {view === "loading" && (
             <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-card p-10 flex flex-col items-center justify-center">
-              <Spinner size="lg" label="Loading…" />
+              <Spinner size="lg" label={loadingPhase === 0 ? "Loading…" : loadingPhase === 1 ? "Still looking…" : "Almost there…"} />
               <p className="mt-4 text-center text-sm text-wc-ink/60 max-w-xs">
-                Searching missing-person records.
+                {loadingPhase === 0 && "Searching missing-person records."}
+                {loadingPhase === 1 && "Hang tight — we're still fetching the data."}
+                {loadingPhase === 2 && "Taking longer than usual, but we're still on it."}
               </p>
             </div>
           )}

@@ -26,7 +26,12 @@ export function useLocations(): UseLocationsResult {
       })
       .catch((e) => {
         if (controller.signal.aborted) return;
-        setError(e instanceof Error ? e.message : "Could not load locations.");
+        const msg = e instanceof Error ? e.message : "Could not load locations.";
+        setError(
+          /\(5\d\d\)/.test(msg)
+            ? "There was an error loading the missing persons data, please try again."
+            : msg,
+        );
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
